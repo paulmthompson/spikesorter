@@ -1,0 +1,10 @@
+
+#topMenu .QPushButton {
+        background-position: left center;
+    background-repeat: no-repeat;
+        border: none;
+        border-left: 22px solid transparent;
+        background-color: transparent;
+        text-align: left;
+        padding-left: 44px;
+}

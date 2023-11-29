@@ -1,0 +1,10 @@
+{
+    "name": "spikesorter",
+    "version-string": "0.0.1",
+    "dependencies": [
+        {   "name": "nlohmann-json"
+        }
+    ],
+    "builtin-baseline": "acc3bcf76b84ae5041c86ab55fe138ae7b8255c7",
+    "$comment": "hash corresponds to 2022.03.10"
+}
