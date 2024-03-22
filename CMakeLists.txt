@@ -42,6 +42,9 @@ set(PROJECT_SOURCES
         spikesorter/mainwindow/mainwindow.ui
         spikesorter.qrc
         my_stylesheet.qss
+
+        spikesorter/AnalogRenderArea/analogrenderarea.hpp
+        spikesorter/AnalogRenderArea/analogrenderarea.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
