@@ -15,6 +15,8 @@ AnalogRenderArea::AnalogRenderArea(QWidget *parent)
     debug = false;
     track_horizontal = true;
 
+    x_axis_width_in_samples = 1000;
+
     antialiased = false;
     pixmap.load(":/images/qt-logo.png");
 
@@ -73,34 +75,14 @@ void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
     QElapsedTimer paintTimer;
     paintTimer.start();
 
-    QPainterPath path;
-    path.moveTo(20, 80);
-    path.lineTo(20, 30);
-    path.cubicTo(80, 0, 50, 50, 80, 80);
-
     QPainter painter(this);
 
     drawBackground(painter);
 
+    drawAnalogLines(painter);
+
     if (this->track_horizontal) {
         drawMouseVerticalLine(painter);
-    }
-
-    painter.setPen(this->pen);
-    painter.setBrush(this->brush);
-    if (antialiased) {
-        painter.setRenderHint(QPainter::Antialiasing, true);
-    }
-
-    for (int x = 0; x < width(); x += 100) {
-        for (int y = 0; y < height(); y += 100) {
-            painter.save();
-            painter.translate(x, y);
-
-            painter.drawPath(path);
-
-            painter.restore();
-        }
     }
 
     qint64 elapsed_ns = paintTimer.nsecsElapsed();
@@ -128,3 +110,40 @@ void AnalogRenderArea::drawMouseVerticalLine(QPainter& painter) {
     painter.restore();
 }
 
+void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
+
+    painter.setPen(this->pen);
+    painter.setBrush(this->brush);
+    if (antialiased) {
+        painter.setRenderHint(QPainter::Antialiasing, true);
+    }
+
+    // Calculate the number of lines based on vertical zoom, and y positions of those
+    uint16_t n_lines_to_draw = 1;
+
+    // Calculate the horizontal scale factor
+    qreal scale_x = this->x_axis_width_in_samples / this->width();
+
+    for (int x = 0; x < n_lines_to_draw; x += 1) {
+
+        // Save painter before each line that is drawn
+        painter.save();
+
+        painter.scale(scale_x,1.0);
+
+        drawAnalogLine(painter);
+
+        painter.restore();
+    }
+
+}
+
+void AnalogRenderArea::drawAnalogLine(QPainter& painter) {
+
+    QPainterPath path;
+
+    path.moveTo(0, height() / 2);
+    path.lineTo(this->x_axis_width_in_samples, height() / 2);
+
+    painter.drawPath(path);
+}

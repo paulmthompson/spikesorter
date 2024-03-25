@@ -44,8 +44,13 @@ private:
     bool antialiased;
     QPixmap pixmap;
     QPoint last_mouse_event_coords;
+
+    int64_t x_axis_width_in_samples;
+
     void drawBackground(QPainter& painter);
     void drawMouseVerticalLine(QPainter& painter);
+    void drawAnalogLines(QPainter& painter);
+    void drawAnalogLine(QPainter& painter);
 };
 
 
