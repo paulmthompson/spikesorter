@@ -11,6 +11,7 @@
 #include <QPen>
 #include <QPixmap>
 #include <QWidget>
+#include <QMouseEvent>
 
 class AnalogRenderArea : public QWidget
 {
@@ -30,6 +31,7 @@ public slots:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
     QPen pen;

@@ -6,6 +6,8 @@
 #include <QPainter>
 #include <QPainterPath>
 
+#include <QDebug>
+
 AnalogRenderArea::AnalogRenderArea(QWidget *parent)
         : QWidget(parent)
 {
@@ -17,6 +19,9 @@ AnalogRenderArea::AnalogRenderArea(QWidget *parent)
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
+
+    setMouseTracking(true);
+
 }
 
 QSize AnalogRenderArea::minimumSizeHint() const
@@ -53,6 +58,10 @@ void AnalogRenderArea::drawBackground(QPainter& painter)
     painter.setPen(palette().dark().color());
     painter.setBrush(Qt::SolidPattern);
     painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
+}
+
+void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
+    qDebug() << event->pos();
 }
 
 void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
