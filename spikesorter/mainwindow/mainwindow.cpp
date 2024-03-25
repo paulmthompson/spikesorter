@@ -25,14 +25,14 @@ void MainWindow::createActions() {
 
 void MainWindow::setChannelDisplayNum(int n_channels_to_display) {
 
-    qDebug() << "Reset view number to " << n_channels_to_display;
+    // qDebug() << "Reset view number to " << n_channels_to_display;
 
     ui->analog_render_area->setVerticalZoom(n_channels_to_display);
 }
 
 void MainWindow::setCenterSample(int center_sample) {
 
-    qDebug() << "Scrolling to " << center_sample;
+    // qDebug() << "Scrolling to " << center_sample;
 
     ui->analog_render_area->setCenterSample(center_sample);
 

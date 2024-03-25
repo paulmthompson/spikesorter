@@ -252,4 +252,17 @@ void AnalogRenderArea::createVirtualData(int n_channels, int n_samples) {
         virtual_data[i] = std::vector<float>(n_samples);
         std::generate(begin(virtual_data[i]),end(virtual_data[i]),gen);
     }
+
+    // Add spikes
+    for (int i = 0; i< virtual_data.size(); i ++) {
+        auto spikes =  std::vector<float>(n_samples);
+        std::generate(begin(spikes),end(spikes),gen);
+        for (int j = 0; j < n_samples; j++) {
+            if (spikes[j] > 9.5) {
+                virtual_data[i][j] += 10.0;
+            } else if (spikes[j] < -9.5) {
+                virtual_data[i][j] += -10.0;
+            }
+        }
+    }
 }
