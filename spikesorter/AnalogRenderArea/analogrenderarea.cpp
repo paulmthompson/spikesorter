@@ -20,9 +20,8 @@ AnalogRenderArea::AnalogRenderArea(QWidget *parent)
     createVirtualData(32,30000 * 5);
 
     XAxisProps = AnalogRenderXAxisProps();
-    x_axis_width_in_samples = 10000;
 
-    this->analog_line_offsets = std::vector<float>(2);
+    this->analog_line_offsets = std::vector<float>(1);
     calculate_analog_line_offsets();
 
     antialiased = false;
@@ -31,7 +30,7 @@ AnalogRenderArea::AnalogRenderArea(QWidget *parent)
     this->pen = QPen(Qt::white); // Outline of shapes and lines
     this->brush = QBrush(Qt::NoBrush); // Fill pattern of shapes
 
-    this->analog_path.reserve(x_axis_width_in_samples);
+    this->analog_path.reserve(XAxisProps.getSamplesToShow());
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
@@ -163,7 +162,8 @@ void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
     }
 
     // Calculate the horizontal scale factor
-    qreal scale_x = static_cast<float>(this->width()) / static_cast<float>(this->x_axis_width_in_samples);
+    qreal scale_x = static_cast<float>(this->width()) / static_cast<float>(this->XAxisProps.getSamplesToShow());
+    qreal global_y_gain = 1.0;
 
     for (int x = 0; x < this->analog_line_offsets.size(); x += 1) {
 
@@ -172,8 +172,10 @@ void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
 
         float y_offset = this->analog_line_offsets[x];
 
+        qreal local_y_gain = global_y_gain + 0.0;
+
         painter.translate(0.0,y_offset);
-        painter.scale(scale_x,1.0);
+        painter.scale(scale_x,local_y_gain);
 
         drawAnalogLine(painter,this->virtual_data[x]);
 
@@ -188,7 +190,7 @@ void AnalogRenderArea::drawAnalogLine(QPainter& painter, std::vector<float>& dat
 
     analog_path.moveTo(0, data[first_ind]);
 
-    for (int x = 0; x < this->x_axis_width_in_samples; x += 1 ) {
+    for (int x = 0; x < this->XAxisProps.getSamplesToShow(); x += 1 ) {
         analog_path.lineTo(x, data[first_ind + x]);
     }
 

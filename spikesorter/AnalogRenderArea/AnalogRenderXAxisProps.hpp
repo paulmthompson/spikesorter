@@ -20,6 +20,9 @@ public:
 
         calculate_first_and_last_sample_to_show();
     }
+    int64_t getSamplesToShow() {
+        return this->n_samples_to_show;
+    }
 private:
     float sampling_rate;
     int64_t n_samples_total;
