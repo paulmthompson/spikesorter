@@ -28,6 +28,7 @@ public slots:
     void setPen(const QPen &pen);
     void setBrush(const QBrush &brush);
     void setAntialiased(bool antialiased);
+    void setHorizontalZoom(int64_t n_samples);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

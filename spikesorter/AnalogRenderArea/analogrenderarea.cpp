@@ -58,6 +58,15 @@ void AnalogRenderArea::setAntialiased(bool antialiased)
     update();
 }
 
+void AnalogRenderArea::setHorizontalZoom(int64_t n_samples) {
+
+    this->x_axis_width_in_samples = n_samples;
+
+    //Reserve painter path
+
+    update();
+}
+
 void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
 
     if (this->debug) {
