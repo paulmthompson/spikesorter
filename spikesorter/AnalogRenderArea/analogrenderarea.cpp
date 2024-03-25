@@ -88,8 +88,9 @@ void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
 
     painter.setPen(this->pen);
     painter.setBrush(this->brush);
-    if (antialiased)
+    if (antialiased) {
         painter.setRenderHint(QPainter::Antialiasing, true);
+    }
 
     for (int x = 0; x < width(); x += 100) {
         for (int y = 0; y < height(); y += 100) {
@@ -102,17 +103,16 @@ void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
         }
     }
 
-    painter.setRenderHint(QPainter::Antialiasing, false);
-
     qint64 elapsed_ns = paintTimer.nsecsElapsed();
-    qint64 elapsed_ms = elapsed_ns/1000L;
+    qint64 elapsed_us = elapsed_ns/1000L;
 
-    qDebug() << "Time to paint : " << elapsed_ms << "us";
+    qDebug() << "Time to paint : " << elapsed_us << "us";
 }
 
 void AnalogRenderArea::drawBackground(QPainter& painter)
 {
     // Black background
+    painter.setRenderHint(QPainter::Antialiasing, false);
     painter.setPen(palette().dark().color());
     painter.setBrush(Qt::SolidPattern);
     painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
