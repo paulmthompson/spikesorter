@@ -11,6 +11,9 @@
 AnalogRenderArea::AnalogRenderArea(QWidget *parent)
         : QWidget(parent)
 {
+    debug = false;
+    track_horizontal = true;
+
     antialiased = false;
     pixmap.load(":/images/qt-logo.png");
 
@@ -52,16 +55,15 @@ void AnalogRenderArea::setAntialiased(bool antialiased)
     update();
 }
 
-void AnalogRenderArea::drawBackground(QPainter& painter)
-{
-    // Black background
-    painter.setPen(palette().dark().color());
-    painter.setBrush(Qt::SolidPattern);
-    painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
-}
-
 void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
-    qDebug() << event->pos();
+
+    if (this->debug) {
+        qDebug() << event->pos();
+    }
+
+    this->last_mouse_event_coords = event->pos();
+
+    update();
 }
 
 void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
@@ -75,6 +77,10 @@ void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
     QPainter painter(this);
 
     drawBackground(painter);
+
+    if (this->track_horizontal) {
+        drawMouseVerticalLine(painter);
+    }
 
     painter.setPen(this->pen);
     painter.setBrush(this->brush);
@@ -94,7 +100,23 @@ void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
 
     painter.setRenderHint(QPainter::Antialiasing, false);
 
-
 }
 
+void AnalogRenderArea::drawBackground(QPainter& painter)
+{
+    // Black background
+    painter.setPen(palette().dark().color());
+    painter.setBrush(Qt::SolidPattern);
+    painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
+}
+
+void AnalogRenderArea::drawMouseVerticalLine(QPainter& painter) {
+
+    painter.save();
+
+    painter.setPen(Qt::white);
+    painter.drawLine(last_mouse_event_coords.x(),0,last_mouse_event_coords.x(),height());
+
+    painter.restore();
+}
 

@@ -34,11 +34,18 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
+    bool debug;
+
+    bool track_horizontal;
+
     QPen pen;
     QBrush brush;
+
     bool antialiased;
     QPixmap pixmap;
+    QPoint last_mouse_event_coords;
     void drawBackground(QPainter& painter);
+    void drawMouseVerticalLine(QPainter& painter);
 };
 
 
