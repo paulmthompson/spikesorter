@@ -14,20 +14,18 @@ public:
         this->n_channels_total = n_channels_total;
         this->n_channels_to_show = n_channels_display;
 
-        this->line_offsets = std::vector<float>(n_channels_display);
-        calculate_line_offsets();
-        this->lower_channel_bounds = std::vector<float>(n_channels_display);
-        calculate_channel_bounds();
-
         this->per_channel_gain = std::vector<float>(n_channels_total, 0.0);
-        this->which_channels_to_show = std::vector<int64_t>(n_channels_display);
-        for (int i = 0; i < n_channels_display; i++) {
-            this->which_channels_to_show[i] = i;
-        }
+
+        calculate_line_offsets();
+        calculate_channel_bounds();
+        calculate_which_channels_to_show();
+
     };
     void setChannelsToDisplay(int64_t n_channels_to_display) {
         this->n_channels_to_show = n_channels_to_display;
         calculate_line_offsets();
+        calculate_channel_bounds();
+        calculate_which_channels_to_show();
     };
     float getLineOffset(int channel) {
         return line_offsets[channel];
@@ -49,6 +47,8 @@ private:
 
     void calculate_line_offsets() {
 
+        this->line_offsets = std::vector<float>(this->n_channels_to_show);
+
         float spacing = 1.0 / (this->line_offsets.size() + 1);
         for (int x = 0; x < this->line_offsets.size(); x++) {
             line_offsets[x] = spacing * (x + 1);
@@ -56,9 +56,19 @@ private:
     };
     void calculate_channel_bounds() {
 
+        this->lower_channel_bounds = std::vector<float>(this->n_channels_to_show);
+
         float spacing = 1.0 / static_cast<float>(this->lower_channel_bounds.size());
         for (int x = 0; x < this->lower_channel_bounds.size(); x++) {
             lower_channel_bounds[x] = spacing * static_cast<float>(x + 1);
+        }
+    };
+
+    void calculate_which_channels_to_show() {
+
+        this->which_channels_to_show = std::vector<int64_t>(this->n_channels_to_show,0);
+        for (int i = 0; i < this->n_channels_to_show; i++) {
+            this->which_channels_to_show[i] = i;
         }
     };
 

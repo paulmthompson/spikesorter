@@ -20,10 +20,11 @@ protected:
 
 private:
     Ui::MainWindow *ui;
+    void createActions();
 
 
 private slots:
-    
+    void setChannelDisplayNum(int n_channels_to_display);
 };
 
 #endif // MAINWINDOW_H

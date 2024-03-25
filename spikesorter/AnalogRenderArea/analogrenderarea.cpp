@@ -14,12 +14,12 @@
 AnalogRenderArea::AnalogRenderArea(QWidget *parent)
         : QWidget(parent)
 {
-    debug = true;
+    debug = false;
     track_horizontal = true;
 
     int virtual_data_n_channel = 32;
     int sample_rate = 30000;
-    int channels_to_display = 2;
+    int channels_to_display = 1;
 
     createVirtualData(virtual_data_n_channel,sample_rate * 5);
 
@@ -119,7 +119,7 @@ void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
         qDebug() << "Nearest channel is " << getNearestChannelToMouse(event);
     }
 
-    //this->last_mouse_event_coords = event->pos();
+    this->last_mouse_event_coords = event->pos();
 
     update();
 }
