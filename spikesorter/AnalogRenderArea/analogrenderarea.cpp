@@ -7,6 +7,7 @@
 #include <QPainterPath>
 
 #include <QDebug>
+#include <QElapsedTimer>
 
 AnalogRenderArea::AnalogRenderArea(QWidget *parent)
         : QWidget(parent)
@@ -69,6 +70,9 @@ void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
 void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
 {
 
+    QElapsedTimer paintTimer;
+    paintTimer.start();
+
     QPainterPath path;
     path.moveTo(20, 80);
     path.lineTo(20, 30);
@@ -100,6 +104,10 @@ void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
 
     painter.setRenderHint(QPainter::Antialiasing, false);
 
+    qint64 elapsed_ns = paintTimer.nsecsElapsed();
+    qint64 elapsed_ms = elapsed_ns/1000L;
+
+    qDebug() << "Time to paint : " << elapsed_ms << "us";
 }
 
 void AnalogRenderArea::drawBackground(QPainter& painter)
