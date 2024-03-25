@@ -14,7 +14,7 @@
 AnalogRenderArea::AnalogRenderArea(QWidget *parent)
         : QWidget(parent)
 {
-    debug = true;
+    debug = false;
     track_horizontal = true;
 
     createVirtualData(32,30000 * 5);
@@ -22,8 +22,8 @@ AnalogRenderArea::AnalogRenderArea(QWidget *parent)
     XAxisProps = AnalogRenderXAxisProps();
     XAxisProps.setXAxisProps(30000.0, 30000 * 5);
 
-    this->analog_line_offsets = std::vector<float>(1);
-    calculate_analog_line_offsets();
+    YAxisProps = AnalogRenderYAxisProps();
+    YAxisProps.setYAxisProps(5,2);
 
     antialiased = false;
     pixmap.load(":/images/qt-logo.png");
@@ -51,8 +51,6 @@ QSize AnalogRenderArea::sizeHint() const
 }
 
 void AnalogRenderArea::resizeEvent(QResizeEvent* event) {
-
-    calculate_analog_line_offsets();
 
     update();
 }
@@ -92,14 +90,6 @@ void AnalogRenderArea::setCenterSample(int64_t sample) {
     update();
 }
 
-void AnalogRenderArea::calculate_analog_line_offsets() {
-
-    float spacing = static_cast<float>(height()) / (this->analog_line_offsets.size() + 1);
-    for (int x = 0; x < this->analog_line_offsets.size(); x++) {
-        analog_line_offsets[x] = spacing * (x + 1);
-    }
-}
-
 float AnalogRenderArea::calculate_horizontal_scale() {
     //Calculates the scale in pixels / samples
 
@@ -108,9 +98,7 @@ float AnalogRenderArea::calculate_horizontal_scale() {
 
 void AnalogRenderArea::setVerticalZoom(int64_t n_lines_to_show) {
 
-    this->analog_line_offsets = std::vector<float>(n_lines_to_show);
-
-    calculate_analog_line_offsets();
+    YAxisProps.setChannelsToDisplay(n_lines_to_show);
 
     update();
 }
@@ -185,19 +173,22 @@ void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
     qreal scale_x = calculate_horizontal_scale();
     qreal global_y_gain = 1.0;
 
-    for (int x = 0; x < this->analog_line_offsets.size(); x += 1) {
+    for (int x = 0; x < YAxisProps.getNChannelsToDisplay(); x += 1) {
 
         // Save painter before each line that is drawn
         painter.save();
 
-        float y_offset = this->analog_line_offsets[x];
+        int data_channel = YAxisProps.getDataChannelFromDisplayChannel(x);
 
-        qreal local_y_gain = global_y_gain + 0.0;
+        float y_offset = YAxisProps.getLineOffset(x) * static_cast<float>(height());
+        float this_channel_gain = YAxisProps.getChannelGain(data_channel);
+
+        qreal local_y_gain = global_y_gain + this_channel_gain;
 
         painter.translate(0.0,y_offset);
         painter.scale(scale_x,local_y_gain);
 
-        drawAnalogLine(painter,this->virtual_data[x]);
+        drawAnalogLine(painter,this->virtual_data[data_channel]);
 
         painter.restore();
     }

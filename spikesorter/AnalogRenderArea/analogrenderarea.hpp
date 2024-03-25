@@ -14,6 +14,7 @@
 #include <QMouseEvent>
 #include <QPainterPath>
 #include "AnalogRenderXAxisProps.hpp"
+#include "AnalogRenderYAxisProps.hpp"
 
 class AnalogRenderArea : public QWidget
 {
@@ -57,9 +58,7 @@ private:
 
     int64_t x_axis_width_in_samples;
     AnalogRenderXAxisProps XAxisProps;
-
-    std::vector<float> analog_line_offsets;
-    void calculate_analog_line_offsets();
+    AnalogRenderYAxisProps YAxisProps;
 
     float calculate_horizontal_scale();
 
