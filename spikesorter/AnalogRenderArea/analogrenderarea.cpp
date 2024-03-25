@@ -170,26 +170,26 @@ void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
         // Save painter before each line that is drawn
         painter.save();
 
-        painter.scale(scale_x,1.0);
-
-        // Could this be done with translation instead of passing offset?
         float y_offset = this->analog_line_offsets[x];
 
-        drawAnalogLine(painter,y_offset,this->virtual_data[x]);
+        painter.translate(0.0,y_offset);
+        painter.scale(scale_x,1.0);
+
+        drawAnalogLine(painter,this->virtual_data[x]);
 
         painter.restore();
     }
 
 }
 
-void AnalogRenderArea::drawAnalogLine(QPainter& painter, float y_offset,std::vector<float>& data) {
+void AnalogRenderArea::drawAnalogLine(QPainter& painter, std::vector<float>& data) {
 
     int first_ind = 0;
 
-    analog_path.moveTo(0, y_offset + data[first_ind]);
+    analog_path.moveTo(0, data[first_ind]);
 
     for (int x = 0; x < this->x_axis_width_in_samples; x += 1 ) {
-        analog_path.lineTo(x, y_offset + data[first_ind + x]);
+        analog_path.lineTo(x, data[first_ind + x]);
     }
 
     painter.drawPath(analog_path);

@@ -63,7 +63,7 @@ private:
     void drawBackground(QPainter& painter);
     void drawMouseVerticalLine(QPainter& painter);
     void drawAnalogLines(QPainter& painter);
-    void drawAnalogLine(QPainter& painter,float y_offset,std::vector<float>& data);
+    void drawAnalogLine(QPainter& painter, std::vector<float>& data);
     void createVirtualData(int n_channels, int n_samples);
 };
 
