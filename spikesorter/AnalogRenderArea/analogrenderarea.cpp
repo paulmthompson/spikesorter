@@ -15,13 +15,17 @@ AnalogRenderArea::AnalogRenderArea(QWidget *parent)
     debug = false;
     track_horizontal = true;
 
-    x_axis_width_in_samples = 1000;
+    x_axis_width_in_samples = 10000;
+
+    analog_line_offsets = {static_cast<float>(height()) / 2};
 
     antialiased = false;
     pixmap.load(":/images/qt-logo.png");
 
     this->pen = QPen(Qt::white); // Outline of shapes and lines
     this->brush = QBrush(Qt::white); // Fill pattern of shapes
+
+    this->analog_path.reserve(x_axis_width_in_samples);
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
@@ -38,6 +42,13 @@ QSize AnalogRenderArea::minimumSizeHint() const
 QSize AnalogRenderArea::sizeHint() const
 {
     return QSize(400, 200);
+}
+
+void AnalogRenderArea::resizeEvent(QResizeEvent* event) {
+
+    calculate_analog_line_offsets();
+
+    update();
 }
 
 void AnalogRenderArea::setPen(const QPen &pen)
@@ -63,6 +74,23 @@ void AnalogRenderArea::setHorizontalZoom(int64_t n_samples) {
     this->x_axis_width_in_samples = n_samples;
 
     //Reserve painter path
+    this->analog_path.reserve(n_samples);
+
+    update();
+}
+
+void AnalogRenderArea::calculate_analog_line_offsets() {
+
+    float spacing = static_cast<float>(height()) / (this->analog_line_offsets.size() + 1);
+    for (int x = 0; x < this->analog_line_offsets.size(); x++) {
+        analog_line_offsets[x] = spacing * (x + 1);
+    }
+}
+void AnalogRenderArea::setVerticalZoom(int64_t n_lines_to_show) {
+
+    this->analog_line_offsets = std::vector<float>(n_lines_to_show);
+
+    calculate_analog_line_offsets();
 
     update();
 }
@@ -77,6 +105,7 @@ void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
 
     update();
 }
+
 
 void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
 {
@@ -127,37 +156,34 @@ void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
         painter.setRenderHint(QPainter::Antialiasing, true);
     }
 
-    // Calculate the number of lines based on vertical zoom, and y positions of those
-    uint16_t n_lines_to_draw = 1;
-
     // Calculate the horizontal scale factor
     qreal scale_x = this->x_axis_width_in_samples / this->width();
 
-    for (int x = 0; x < n_lines_to_draw; x += 1) {
+    for (int x = 0; x < this->analog_line_offsets.size(); x += 1) {
 
         // Save painter before each line that is drawn
         painter.save();
 
         painter.scale(scale_x,1.0);
 
-        drawAnalogLine(painter);
+        float y_offset = this->analog_line_offsets[0];
+
+        drawAnalogLine(painter,y_offset);
 
         painter.restore();
     }
 
 }
 
-void AnalogRenderArea::drawAnalogLine(QPainter& painter) {
+void AnalogRenderArea::drawAnalogLine(QPainter& painter, float y_offset) {
 
-    QPainterPath path;
-
-    qreal y_offset = height() / 2;
-
-    path.moveTo(0, y_offset);
+    analog_path.moveTo(0, y_offset);
 
     for (int x = 0; x < this->x_axis_width_in_samples; x += 1 ) {
-        path.lineTo(x, y_offset);
+        analog_path.lineTo(x, y_offset);
     }
 
-    painter.drawPath(path);
+    painter.drawPath(analog_path);
+
+    analog_path.clear();
 }

@@ -12,6 +12,7 @@
 #include <QPixmap>
 #include <QWidget>
 #include <QMouseEvent>
+#include <QPainterPath>
 
 class AnalogRenderArea : public QWidget
 {
@@ -29,10 +30,12 @@ public slots:
     void setBrush(const QBrush &brush);
     void setAntialiased(bool antialiased);
     void setHorizontalZoom(int64_t n_samples);
+    void setVerticalZoom(int64_t n_lines_to_show);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     bool debug;
@@ -42,16 +45,20 @@ private:
     QPen pen;
     QBrush brush;
 
+    QPainterPath analog_path;
+
     bool antialiased;
     QPixmap pixmap;
     QPoint last_mouse_event_coords;
 
     int64_t x_axis_width_in_samples;
+    std::vector<float> analog_line_offsets;
+    void calculate_analog_line_offsets();
 
     void drawBackground(QPainter& painter);
     void drawMouseVerticalLine(QPainter& painter);
     void drawAnalogLines(QPainter& painter);
-    void drawAnalogLine(QPainter& painter);
+    void drawAnalogLine(QPainter& painter,float y_offset);
 };
 
 
