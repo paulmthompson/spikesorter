@@ -27,12 +27,18 @@ public:
     void setCenterSample(int64_t sample) {
         center_sample = sample;
     };
+    int64_t getCenterSample() {
+        return this->center_sample;
+    }
     int64_t getSamplesToShow() {
         return last_sample_to_show - first_sample_to_show;
     };
     int64_t getFirstSample() {
         return this->first_sample_to_show;
-    }
+    };
+    float getSamplingRate() {
+        return this->sampling_rate;
+    };
 private:
     float sampling_rate;
     int64_t n_samples_total;

@@ -14,7 +14,7 @@
 AnalogRenderArea::AnalogRenderArea(QWidget *parent)
         : QWidget(parent)
 {
-    debug = false;
+    debug = true;
     track_horizontal = true;
 
     createVirtualData(32,30000 * 5);
@@ -99,6 +99,13 @@ void AnalogRenderArea::calculate_analog_line_offsets() {
         analog_line_offsets[x] = spacing * (x + 1);
     }
 }
+
+float AnalogRenderArea::calculate_horizontal_scale() {
+    //Calculates the scale in pixels / samples
+
+    return static_cast<float>(this->width()) / static_cast<float>(this->XAxisProps.getSamplesToShow());
+}
+
 void AnalogRenderArea::setVerticalZoom(int64_t n_lines_to_show) {
 
     this->analog_line_offsets = std::vector<float>(n_lines_to_show);
@@ -110,11 +117,16 @@ void AnalogRenderArea::setVerticalZoom(int64_t n_lines_to_show) {
 
 void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
 
+    int64_t first_sample = this->XAxisProps.getFirstSample();
+
+    float sample_under_mouse_event = 1 / calculate_horizontal_scale() * static_cast<float>(event->pos().x());
+
     if (this->debug) {
         qDebug() << event->pos();
+        qDebug() << "This corresponds to sample " << sample_under_mouse_event + first_sample;
     }
 
-    this->last_mouse_event_coords = event->pos();
+    //this->last_mouse_event_coords = event->pos();
 
     update();
 }
@@ -170,7 +182,7 @@ void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
     }
 
     // Calculate the horizontal scale factor
-    qreal scale_x = static_cast<float>(this->width()) / static_cast<float>(this->XAxisProps.getSamplesToShow());
+    qreal scale_x = calculate_horizontal_scale();
     qreal global_y_gain = 1.0;
 
     for (int x = 0; x < this->analog_line_offsets.size(); x += 1) {

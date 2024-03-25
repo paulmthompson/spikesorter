@@ -61,6 +61,8 @@ private:
     std::vector<float> analog_line_offsets;
     void calculate_analog_line_offsets();
 
+    float calculate_horizontal_scale();
+
     void drawBackground(QPainter& painter);
     void drawMouseVerticalLine(QPainter& painter);
     void drawAnalogLines(QPainter& painter);
