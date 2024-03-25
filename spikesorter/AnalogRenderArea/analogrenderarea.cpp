@@ -142,8 +142,13 @@ void AnalogRenderArea::drawAnalogLine(QPainter& painter) {
 
     QPainterPath path;
 
-    path.moveTo(0, height() / 2);
-    path.lineTo(this->x_axis_width_in_samples, height() / 2);
+    qreal y_offset = height() / 2;
+
+    path.moveTo(0, y_offset);
+
+    for (int x = 0; x < this->x_axis_width_in_samples; x += 1 ) {
+        path.lineTo(x, y_offset);
+    }
 
     painter.drawPath(path);
 }
