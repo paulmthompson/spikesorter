@@ -26,6 +26,7 @@ public:
     };
     void setCenterSample(int64_t sample) {
         center_sample = sample;
+        calculate_first_and_last_sample_to_show();
     };
     int64_t getCenterSample() {
         return this->center_sample;

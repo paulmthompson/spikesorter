@@ -25,6 +25,7 @@ private:
 
 private slots:
     void setChannelDisplayNum(int n_channels_to_display);
+    void setCenterSample(int center_sample);
 };
 
 #endif // MAINWINDOW_H
