@@ -12,14 +12,12 @@
 #include <QPixmap>
 #include <QWidget>
 
-//! [0]
 class AnalogRenderArea : public QWidget
 {
 Q_OBJECT
 
 public:
-    enum Shape { Line, Points, Polyline, Polygon, Rect, RoundedRect, Ellipse, Arc,
-        Chord, Pie, Path, Text, Pixmap };
+    enum Shape { Line, Points, Polyline, Rect, Path, Text, Pixmap };
 
     explicit AnalogRenderArea(QWidget *parent = nullptr);
 
@@ -43,9 +41,8 @@ private:
     bool antialiased;
     bool transformed;
     QPixmap pixmap;
+    void drawBackground(QPainter& painter);
 };
-
-//! [0]
 
 
 #endif //SPIKESORTER_ANALOGRENDERAREA_HPP

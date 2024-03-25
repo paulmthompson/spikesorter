@@ -9,10 +9,13 @@
 AnalogRenderArea::AnalogRenderArea(QWidget *parent)
         : QWidget(parent)
 {
-    shape = Polygon;
+    shape = Line;
     antialiased = false;
     transformed = false;
     pixmap.load(":/images/qt-logo.png");
+
+    this->pen = QPen(Qt::white); // Outline of shapes and lines
+    this->brush = QBrush(Qt::white); // Fill pattern of shapes
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
@@ -58,6 +61,13 @@ void AnalogRenderArea::setTransformed(bool transformed)
     update();
 }
 
+void AnalogRenderArea::drawBackground(QPainter& painter)
+{
+    painter.setPen(palette().dark().color());
+    painter.setBrush(Qt::SolidPattern);
+    painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
+}
+
 void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
 {
     static const QPoint points[4] = {
@@ -74,12 +84,13 @@ void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
     path.lineTo(20, 30);
     path.cubicTo(80, 0, 50, 50, 80, 80);
 
-    int startAngle = 20 * 16;
-    int arcLength = 120 * 16;
-
     QPainter painter(this);
-    painter.setPen(pen);
-    painter.setBrush(brush);
+
+    // Black background
+    drawBackground(painter);
+
+    painter.setPen(this->pen);
+    painter.setBrush(this->brush);
     if (antialiased)
         painter.setRenderHint(QPainter::Antialiasing, true);
 
@@ -104,26 +115,8 @@ void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
                 case Polyline:
                     painter.drawPolyline(points, 4);
                     break;
-                case Polygon:
-                    painter.drawPolygon(points, 4);
-                    break;
                 case Rect:
                     painter.drawRect(rect);
-                    break;
-                case RoundedRect:
-                    painter.drawRoundedRect(rect, 25, 25, Qt::RelativeSize);
-                    break;
-                case Ellipse:
-                    painter.drawEllipse(rect);
-                    break;
-                case Arc:
-                    painter.drawArc(rect, startAngle, arcLength);
-                    break;
-                case Chord:
-                    painter.drawChord(rect, startAngle, arcLength);
-                    break;
-                case Pie:
-                    painter.drawPie(rect, startAngle, arcLength);
                     break;
                 case Path:
                     painter.drawPath(path);
@@ -141,9 +134,8 @@ void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
     }
 
     painter.setRenderHint(QPainter::Antialiasing, false);
-    painter.setPen(palette().dark().color());
-    painter.setBrush(Qt::NoBrush);
-    painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
+
+
 }
 
 
