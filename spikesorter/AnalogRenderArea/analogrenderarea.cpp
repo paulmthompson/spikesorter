@@ -20,6 +20,7 @@ AnalogRenderArea::AnalogRenderArea(QWidget *parent)
     createVirtualData(32,30000 * 5);
 
     XAxisProps = AnalogRenderXAxisProps();
+    XAxisProps.setXAxisProps(30000.0, 30000 * 5);
 
     this->analog_line_offsets = std::vector<float>(1);
     calculate_analog_line_offsets();
@@ -76,10 +77,17 @@ void AnalogRenderArea::setAntialiased(bool antialiased)
 
 void AnalogRenderArea::setHorizontalZoom(int64_t n_samples) {
 
-    this->x_axis_width_in_samples = n_samples;
+    XAxisProps.setSamplesToShow(n_samples);
 
     //Reserve painter path
     this->analog_path.reserve(n_samples);
+
+    update();
+}
+
+void AnalogRenderArea::setCenterSample(int64_t sample) {
+
+    XAxisProps.setCenterSample(sample);
 
     update();
 }
@@ -186,7 +194,7 @@ void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
 
 void AnalogRenderArea::drawAnalogLine(QPainter& painter, std::vector<float>& data) {
 
-    int first_ind = 0;
+    int first_ind = this->XAxisProps.getFirstSample();
 
     analog_path.moveTo(0, data[first_ind]);
 

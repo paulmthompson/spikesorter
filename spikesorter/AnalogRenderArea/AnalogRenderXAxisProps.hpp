@@ -19,9 +19,19 @@ public:
         this->sampling_rate = sampling_rate;
 
         calculate_first_and_last_sample_to_show();
-    }
+    };
+    void setSamplesToShow(int64_t n_samples) {
+        n_samples_to_show = n_samples;
+        calculate_first_and_last_sample_to_show();
+    };
+    void setCenterSample(int64_t sample) {
+        center_sample = sample;
+    };
     int64_t getSamplesToShow() {
-        return this->n_samples_to_show;
+        return last_sample_to_show - first_sample_to_show;
+    };
+    int64_t getFirstSample() {
+        return this->first_sample_to_show;
     }
 private:
     float sampling_rate;
@@ -44,9 +54,14 @@ private:
 
         if (left_edge_sample < 0) {
             left_edge_sample = 0;
+            right_edge_sample = n_samples_to_show - 1;
         }
         if (right_edge_sample >= n_samples_total) {
             right_edge_sample = n_samples_total - 1;
+            left_edge_sample = right_edge_sample - n_samples_to_show;
+            if (left_edge_sample < 0) {
+                left_edge_sample = 0;
+            }
         }
 
         first_sample_to_show = left_edge_sample;

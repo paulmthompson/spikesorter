@@ -31,6 +31,7 @@ public slots:
     void setBrush(const QBrush &brush);
     void setAntialiased(bool antialiased);
     void setHorizontalZoom(int64_t n_samples);
+    void setCenterSample(int64_t sample);
     void setVerticalZoom(int64_t n_lines_to_show);
 
 protected:
