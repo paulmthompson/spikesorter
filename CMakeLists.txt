@@ -45,6 +45,7 @@ set(PROJECT_SOURCES
 
         spikesorter/AnalogRenderArea/analogrenderarea.hpp
         spikesorter/AnalogRenderArea/analogrenderarea.cpp
+        spikesorter/AnalogRenderArea/AnalogRenderXAxisProps.hpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

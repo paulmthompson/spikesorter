@@ -13,6 +13,7 @@
 #include <QWidget>
 #include <QMouseEvent>
 #include <QPainterPath>
+#include "AnalogRenderXAxisProps.hpp"
 
 class AnalogRenderArea : public QWidget
 {
@@ -51,14 +52,19 @@ private:
     QPixmap pixmap;
     QPoint last_mouse_event_coords;
 
+    std::vector<std::vector<float>> virtual_data;
+
     int64_t x_axis_width_in_samples;
+    AnalogRenderXAxisProps XAxisProps;
+
     std::vector<float> analog_line_offsets;
     void calculate_analog_line_offsets();
 
     void drawBackground(QPainter& painter);
     void drawMouseVerticalLine(QPainter& painter);
     void drawAnalogLines(QPainter& painter);
-    void drawAnalogLine(QPainter& painter,float y_offset);
+    void drawAnalogLine(QPainter& painter,float y_offset,std::vector<float>& data);
+    void createVirtualData(int n_channels, int n_samples);
 };
 
 

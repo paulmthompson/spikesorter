@@ -9,21 +9,27 @@
 #include <QDebug>
 #include <QElapsedTimer>
 
+#include <random>
+
 AnalogRenderArea::AnalogRenderArea(QWidget *parent)
         : QWidget(parent)
 {
     debug = false;
     track_horizontal = true;
 
+    createVirtualData(32,30000 * 5);
+
+    XAxisProps = AnalogRenderXAxisProps();
     x_axis_width_in_samples = 10000;
 
-    analog_line_offsets = {static_cast<float>(height()) / 2};
+    this->analog_line_offsets = std::vector<float>(2);
+    calculate_analog_line_offsets();
 
     antialiased = false;
     pixmap.load(":/images/qt-logo.png");
 
     this->pen = QPen(Qt::white); // Outline of shapes and lines
-    this->brush = QBrush(Qt::white); // Fill pattern of shapes
+    this->brush = QBrush(Qt::NoBrush); // Fill pattern of shapes
 
     this->analog_path.reserve(x_axis_width_in_samples);
 
@@ -157,7 +163,7 @@ void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
     }
 
     // Calculate the horizontal scale factor
-    qreal scale_x = this->x_axis_width_in_samples / this->width();
+    qreal scale_x = static_cast<float>(this->width()) / static_cast<float>(this->x_axis_width_in_samples);
 
     for (int x = 0; x < this->analog_line_offsets.size(); x += 1) {
 
@@ -166,24 +172,44 @@ void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
 
         painter.scale(scale_x,1.0);
 
-        float y_offset = this->analog_line_offsets[0];
+        // Could this be done with translation instead of passing offset?
+        float y_offset = this->analog_line_offsets[x];
 
-        drawAnalogLine(painter,y_offset);
+        drawAnalogLine(painter,y_offset,this->virtual_data[x]);
 
         painter.restore();
     }
 
 }
 
-void AnalogRenderArea::drawAnalogLine(QPainter& painter, float y_offset) {
+void AnalogRenderArea::drawAnalogLine(QPainter& painter, float y_offset,std::vector<float>& data) {
 
-    analog_path.moveTo(0, y_offset);
+    int first_ind = 0;
+
+    analog_path.moveTo(0, y_offset + data[first_ind]);
 
     for (int x = 0; x < this->x_axis_width_in_samples; x += 1 ) {
-        analog_path.lineTo(x, y_offset);
+        analog_path.lineTo(x, y_offset + data[first_ind + x]);
     }
 
     painter.drawPath(analog_path);
 
     analog_path.clear();
+}
+
+void AnalogRenderArea::createVirtualData(int n_channels, int n_samples) {
+
+    std::random_device random_device;
+    std::mt19937 random_engine{random_device()};
+    std::uniform_real_distribution distribution100 = std::uniform_real_distribution<float>(-10,10);
+
+    virtual_data = std::vector<std::vector<float>>(n_channels);
+
+    auto gen = [&distribution100, &random_engine](){
+        return distribution100(random_engine);
+    };
+    for (int i = 0; i< virtual_data.size(); i ++) {
+        virtual_data[i] = std::vector<float>(n_samples);
+        std::generate(begin(virtual_data[i]),end(virtual_data[i]),gen);
+    }
 }
