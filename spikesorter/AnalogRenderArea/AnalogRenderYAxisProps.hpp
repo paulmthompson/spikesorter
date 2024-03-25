@@ -16,6 +16,8 @@ public:
 
         this->line_offsets = std::vector<float>(n_channels_display);
         calculate_line_offsets();
+        this->lower_channel_bounds = std::vector<float>(n_channels_display);
+        calculate_channel_bounds();
 
         this->per_channel_gain = std::vector<float>(n_channels_total, 0.0);
         this->which_channels_to_show = std::vector<int64_t>(n_channels_display);
@@ -30,6 +32,9 @@ public:
     float getLineOffset(int channel) {
         return line_offsets[channel];
     };
+    float getLowerChannelBound(int channel) {
+        return lower_channel_bounds[channel];
+    }
     float getChannelGain(int data_channel) {
         return this->per_channel_gain[data_channel];
     }
@@ -49,12 +54,20 @@ private:
             line_offsets[x] = spacing * (x + 1);
         }
     };
+    void calculate_channel_bounds() {
+
+        float spacing = 1.0 / static_cast<float>(this->lower_channel_bounds.size());
+        for (int x = 0; x < this->lower_channel_bounds.size(); x++) {
+            lower_channel_bounds[x] = spacing * static_cast<float>(x + 1);
+        }
+    };
 
     int64_t n_channels_total;
     int64_t n_channels_to_show;
     std::vector<int64_t> which_channels_to_show;
     std::vector<float> per_channel_gain;
     std::vector<float> line_offsets;
+    std::vector<float> lower_channel_bounds;
 };
 
 #endif // ANALOGRENDERYAXISPROPS_HPP

@@ -64,6 +64,8 @@ private:
 
     void drawBackground(QPainter& painter);
     void drawMouseVerticalLine(QPainter& painter);
+    float getMousePositionInSamples(QMouseEvent *event);
+    int getNearestChannelToMouse(QMouseEvent *event);
     void drawAnalogLines(QPainter& painter);
     void drawAnalogLine(QPainter& painter, std::vector<float>& data);
     void createVirtualData(int n_channels, int n_samples);

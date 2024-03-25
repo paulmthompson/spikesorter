@@ -14,16 +14,20 @@
 AnalogRenderArea::AnalogRenderArea(QWidget *parent)
         : QWidget(parent)
 {
-    debug = false;
+    debug = true;
     track_horizontal = true;
 
-    createVirtualData(32,30000 * 5);
+    int virtual_data_n_channel = 32;
+    int sample_rate = 30000;
+    int channels_to_display = 2;
+
+    createVirtualData(virtual_data_n_channel,sample_rate * 5);
 
     XAxisProps = AnalogRenderXAxisProps();
-    XAxisProps.setXAxisProps(30000.0, 30000 * 5);
+    XAxisProps.setXAxisProps(sample_rate, sample_rate * 5);
 
     YAxisProps = AnalogRenderYAxisProps();
-    YAxisProps.setYAxisProps(5,2);
+    YAxisProps.setYAxisProps(virtual_data_n_channel,channels_to_display);
 
     antialiased = false;
     pixmap.load(":/images/qt-logo.png");
@@ -107,11 +111,12 @@ void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
 
     int64_t first_sample = this->XAxisProps.getFirstSample();
 
-    float sample_under_mouse_event = 1 / calculate_horizontal_scale() * static_cast<float>(event->pos().x());
+    float sample_under_mouse_event = getMousePositionInSamples(event);
 
     if (this->debug) {
         qDebug() << event->pos();
         qDebug() << "This corresponds to sample " << sample_under_mouse_event + first_sample;
+        qDebug() << "Nearest channel is " << getNearestChannelToMouse(event);
     }
 
     //this->last_mouse_event_coords = event->pos();
@@ -119,6 +124,28 @@ void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
     update();
 }
 
+float AnalogRenderArea::getMousePositionInSamples(QMouseEvent *event) {
+    return static_cast<float>(event->pos().x()) / calculate_horizontal_scale();
+}
+
+int AnalogRenderArea::getNearestChannelToMouse(QMouseEvent *event) {
+
+    float mouse_y_pos = static_cast<float>(event->pos().y());
+
+    int channel_to_check = 0;
+
+    while(channel_to_check <  YAxisProps.getNChannelsToDisplay()) {
+
+        float lower_bound = YAxisProps.getLowerChannelBound(channel_to_check) * static_cast<float>(height());
+
+        if (mouse_y_pos < lower_bound) {
+            break;
+        } else {
+            channel_to_check += 1;
+        }
+    }
+    return YAxisProps.getDataChannelFromDisplayChannel(channel_to_check);
+}
 
 void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
 {
