@@ -16,6 +16,7 @@ AnalogRenderArea::AnalogRenderArea(QWidget *parent)
 {
     debug = false;
     track_horizontal = true;
+    canvas_label_width = 30.0;
 
     int virtual_data_n_channel = 32;
     int sample_rate = 30000;
@@ -97,7 +98,9 @@ void AnalogRenderArea::setCenterSample(int64_t sample) {
 float AnalogRenderArea::calculate_horizontal_scale() {
     //Calculates the scale in pixels / samples
 
-    return static_cast<float>(this->width()) / static_cast<float>(this->XAxisProps.getSamplesToShow());
+    float canvas_width = static_cast<float>(this->width()) - this->canvas_label_width; // Reserve 30 pixels for labels
+
+    return  canvas_width / static_cast<float>(this->XAxisProps.getSamplesToShow());
 }
 
 void AnalogRenderArea::setVerticalZoom(int64_t n_lines_to_show) {
@@ -125,7 +128,13 @@ void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
 }
 
 float AnalogRenderArea::getMousePositionInSamples(QMouseEvent *event) {
-    return static_cast<float>(event->pos().x()) / calculate_horizontal_scale();
+    float mouse_x = static_cast<float>(event->pos().x());
+
+    if (mouse_x < this->canvas_label_width) {
+        return 0.0;
+    } else {
+        return (mouse_x - this->canvas_label_width) / calculate_horizontal_scale();
+    }
 }
 
 int AnalogRenderArea::getNearestChannelToMouse(QMouseEvent *event) {
@@ -212,10 +221,35 @@ void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
 
         qreal local_y_gain = global_y_gain + this_channel_gain;
 
-        painter.translate(0.0,y_offset);
+        painter.translate(this->canvas_label_width,y_offset);
         painter.scale(scale_x,local_y_gain);
 
         drawAnalogLine(painter,this->virtual_data[data_channel]);
+
+        painter.restore();
+    }
+
+    drawChannelLabels(painter);
+
+}
+
+void AnalogRenderArea::drawChannelLabels(QPainter& painter) {
+
+    QFont font = painter.font() ;
+    font.setPixelSize(16);
+
+    for (int x = 0; x < YAxisProps.getNChannelsToDisplay(); x += 1) {
+
+        // Save painter before each line that is drawn
+        painter.save();
+
+        painter.setFont(font);
+
+        int data_channel = YAxisProps.getDataChannelFromDisplayChannel(x);
+
+        float y_offset = YAxisProps.getLineOffset(x) * static_cast<float>(height());
+
+        painter.drawText(QPointF(10.0,y_offset),QString::fromStdString(std::to_string(data_channel)));
 
         painter.restore();
     }

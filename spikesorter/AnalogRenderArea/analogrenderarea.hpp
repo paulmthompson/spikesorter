@@ -45,6 +45,8 @@ private:
 
     bool track_horizontal;
 
+    float canvas_label_width;
+
     QPen pen;
     QBrush brush;
 
@@ -69,6 +71,7 @@ private:
     void drawAnalogLines(QPainter& painter);
     void drawAnalogLine(QPainter& painter, std::vector<float>& data);
     void createVirtualData(int n_channels, int n_samples);
+    void drawChannelLabels(QPainter& painter);
 };
 
 
