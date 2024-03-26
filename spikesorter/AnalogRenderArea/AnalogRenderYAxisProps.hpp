@@ -2,14 +2,29 @@
 #define ANALOGRENDERYAXISPROPS_HPP
 
 #include <cstdint>
+#include <iostream>
+#include <ostream>
 #include <vector>
+
+/**
+ *
+ * The AnalogRenderYAxisProps class
+ *
+ * The AnalogRenderArea plots a subset of M channels
+ * from N total channels. AnalogRenderYAxisProps ensures
+ * that different M channels can be select and scrolled
+ * through.
+ *
+ */
 
 class AnalogRenderYAxisProps {
 public:
     AnalogRenderYAxisProps() {
         n_channels_total = 0;
+        scroll_bar_position = 1;
 
     };
+
     void setYAxisProps(int64_t n_channels_total, int64_t n_channels_display) {
         this->n_channels_total = n_channels_total;
         this->n_channels_to_show = n_channels_display;
@@ -21,12 +36,21 @@ public:
         calculate_which_channels_to_show();
 
     };
+
+    /**
+     * @brief setChannelsToDisplay
+     *
+     *
+     *
+     * @param n_channels_to_display
+     */
     void setChannelsToDisplay(int64_t n_channels_to_display) {
         this->n_channels_to_show = n_channels_to_display;
         calculate_line_offsets();
         calculate_channel_bounds();
         calculate_which_channels_to_show();
     };
+
     float getLineOffset(int channel) {
         return line_offsets[channel];
     };
@@ -43,6 +67,19 @@ public:
         return this->which_channels_to_show[display_channel];
     }
 
+    void setScrollBarPosition(int64_t position) {
+
+        //Error checking
+        if ((position < 0) || (position > this->n_channels_total)) {
+            std::cout
+                << "Scroll bar position received by AnalogRenderYAxis doesn't make sense"
+                << std::endl;
+        }
+
+        this->scroll_bar_position = position;
+        calculate_which_channels_to_show();
+    };
+
 private:
 
     void calculate_line_offsets() {
@@ -54,6 +91,7 @@ private:
             line_offsets[x] = spacing * (x + 1);
         }
     };
+
     void calculate_channel_bounds() {
 
         this->lower_channel_bounds = std::vector<float>(this->n_channels_to_show);
@@ -67,13 +105,23 @@ private:
     void calculate_which_channels_to_show() {
 
         this->which_channels_to_show = std::vector<int64_t>(this->n_channels_to_show,0);
+
+        int start_channel = this->scroll_bar_position;
+
+        if ((start_channel + this->n_channels_to_show) > this->n_channels_total) {
+            start_channel = this->n_channels_total - this->n_channels_to_show;
+        }
+
         for (int i = 0; i < this->n_channels_to_show; i++) {
-            this->which_channels_to_show[i] = i;
+            this->which_channels_to_show[i] = start_channel + i - 1;
         }
     };
 
     int64_t n_channels_total;
     int64_t n_channels_to_show;
+
+    int64_t scroll_bar_position;
+
     std::vector<int64_t> which_channels_to_show;
     std::vector<float> per_channel_gain;
     std::vector<float> line_offsets;

@@ -20,8 +20,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::createActions() {
     connect(ui->channels_to_view,SIGNAL(valueChanged(int)),this,SLOT(setChannelDisplayNum(int)));
-    connect(ui->sample_scroll_bar,SIGNAL(valueChanged(int)),this,SLOT(setCenterSample(int)));
     connect(ui->horizontal_samples,SIGNAL(valueChanged(int)),this,SLOT(setHorizontalZoom(int)));
+    connect(ui->sample_scroll_bar,SIGNAL(valueChanged(int)),this,SLOT(setCenterSample(int)));
+    connect(ui->channel_scroll_bar,SIGNAL(valueChanged(int)),this,SLOT(setCenterChannel(int)));
 }
 
 void MainWindow::setChannelDisplayNum(int n_channels_to_display) {
@@ -36,6 +37,13 @@ void MainWindow::setCenterSample(int center_sample) {
     // qDebug() << "Scrolling to " << center_sample;
 
     ui->analog_render_area->setCenterSample(center_sample);
+}
+
+void MainWindow::setCenterChannel(int center_channel) {
+
+    // qDebug() << "Scrolling to " << center_sample;
+
+    ui->analog_render_area->setCenterChannel(center_channel);
 }
 
 void MainWindow::setHorizontalZoom(int n_samples_to_display) {

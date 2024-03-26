@@ -95,6 +95,13 @@ void AnalogRenderArea::setCenterSample(int64_t sample) {
     update();
 }
 
+void AnalogRenderArea::setCenterChannel(int64_t channel) {
+
+    YAxisProps.setScrollBarPosition(channel);
+
+    update();
+}
+
 float AnalogRenderArea::calculate_horizontal_scale() {
     //Calculates the scale in pixels / samples
 
@@ -192,7 +199,12 @@ void AnalogRenderArea::drawMouseVerticalLine(QPainter& painter) {
     painter.save();
 
     painter.setPen(Qt::white);
-    painter.drawLine(last_mouse_event_coords.x(),0,last_mouse_event_coords.x(),height());
+    painter.drawLine(
+        last_mouse_event_coords.x(),
+        0,
+        last_mouse_event_coords.x(),
+        height()
+        );
 
     painter.restore();
 }
@@ -249,7 +261,10 @@ void AnalogRenderArea::drawChannelLabels(QPainter& painter) {
 
         float y_offset = YAxisProps.getLineOffset(x) * static_cast<float>(height());
 
-        painter.drawText(QPointF(10.0,y_offset),QString::fromStdString(std::to_string(data_channel)));
+        painter.drawText(
+            QPointF(10.0,y_offset),
+            QString::fromStdString(std::to_string(data_channel))
+            );
 
         painter.restore();
     }
