@@ -21,8 +21,11 @@ MainWindow::~MainWindow()
 void MainWindow::createActions() {
     connect(ui->channels_to_view,SIGNAL(valueChanged(int)),this,SLOT(setChannelDisplayNum(int)));
     connect(ui->horizontal_samples,SIGNAL(valueChanged(int)),this,SLOT(setHorizontalZoom(int)));
+
     connect(ui->sample_scroll_bar,SIGNAL(valueChanged(int)),this,SLOT(setCenterSample(int)));
     connect(ui->channel_scroll_bar,SIGNAL(valueChanged(int)),this,SLOT(setCenterChannel(int)));
+
+    connect(ui->gain_spin_box,SIGNAL(valueChanged(double)),this,SLOT(setGain(double)));
 }
 
 void MainWindow::setChannelDisplayNum(int n_channels_to_display) {
@@ -51,4 +54,11 @@ void MainWindow::setHorizontalZoom(int n_samples_to_display) {
     // qDebug() << "Setting horizontal sample count to " << n_samples_to_display;
 
     ui->analog_render_area->setHorizontalZoom(n_samples_to_display);
+}
+
+void MainWindow::setGain(double gain) {
+
+    qDebug() << "Setting gain to " << gain;
+
+    ui->analog_render_area->setGain(static_cast<float>(gain));
 }

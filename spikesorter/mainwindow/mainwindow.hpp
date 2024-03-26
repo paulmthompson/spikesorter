@@ -28,6 +28,7 @@ private slots:
     void setCenterSample(int center_sample);
     void setHorizontalZoom(int n_samples_to_display);
     void setCenterChannel(int center_channel);
+    void setGain(double gain);
 };
 
 #endif // MAINWINDOW_H

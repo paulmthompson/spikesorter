@@ -36,6 +36,7 @@ public slots:
 
     void setCenterSample(int64_t sample);
     void setCenterChannel(int64_t channel);
+    void setGain(float gain);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -48,6 +49,8 @@ private:
     bool track_horizontal;
 
     float canvas_label_width;
+
+    float global_gain;
 
     QPen pen;
     QBrush brush;

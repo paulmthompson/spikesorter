@@ -17,6 +17,7 @@ AnalogRenderArea::AnalogRenderArea(QWidget *parent)
     debug = false;
     track_horizontal = true;
     canvas_label_width = 30.0;
+    global_gain = 1.0;
 
     int virtual_data_n_channel = 32;
     int sample_rate = 30000;
@@ -98,6 +99,13 @@ void AnalogRenderArea::setCenterSample(int64_t sample) {
 void AnalogRenderArea::setCenterChannel(int64_t channel) {
 
     YAxisProps.setScrollBarPosition(channel);
+
+    update();
+}
+
+void AnalogRenderArea::setGain(float gain) {
+
+    this->global_gain = gain;
 
     update();
 }
@@ -219,7 +227,7 @@ void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
 
     // Calculate the horizontal scale factor
     qreal scale_x = calculate_horizontal_scale();
-    qreal global_y_gain = 1.0;
+    qreal global_y_gain = this->global_gain;
 
     for (int x = 0; x < YAxisProps.getNChannelsToDisplay(); x += 1) {
 
@@ -268,7 +276,6 @@ void AnalogRenderArea::drawChannelLabels(QPainter& painter) {
 
         painter.restore();
     }
-
 }
 
 void AnalogRenderArea::drawAnalogLine(QPainter& painter, std::vector<float>& data) {
