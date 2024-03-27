@@ -14,10 +14,10 @@
 AnalogRenderArea::AnalogRenderArea(QWidget *parent)
         : QWidget(parent)
 {
-    debug = false;
-    track_horizontal = true;
-    canvas_label_width = 30.0;
-    global_gain = 1.0;
+    _debug = false;
+    _track_horizontal = true;
+    _canvas_label_width = 30.0;
+    _global_gain = 1.0;
 
     int virtual_data_n_channel = 32;
     int sample_rate = 30000;
@@ -25,19 +25,19 @@ AnalogRenderArea::AnalogRenderArea(QWidget *parent)
 
     createVirtualData(virtual_data_n_channel,sample_rate * 5);
 
-    XAxisProps = AnalogRenderXAxisProps();
-    XAxisProps.setXAxisProps(sample_rate, sample_rate * 5);
+    _x_axis_props = AnalogRenderXAxisProps();
+    _x_axis_props.setXAxisProps(sample_rate, sample_rate * 5);
 
-    YAxisProps = AnalogRenderYAxisProps();
-    YAxisProps.setYAxisProps(virtual_data_n_channel,channels_to_display);
+    _y_axis_props = AnalogRenderYAxisProps();
+    _y_axis_props.setYAxisProps(virtual_data_n_channel, channels_to_display);
 
-    antialiased = false;
-    pixmap.load(":/images/qt-logo.png");
+    _antialiased = false;
+    _pixmap.load(":/images/qt-logo.png");
 
-    this->pen = QPen(Qt::white); // Outline of shapes and lines
-    this->brush = QBrush(Qt::NoBrush); // Fill pattern of shapes
+    _pen = QPen(Qt::white); // Outline of shapes and lines
+    _brush = QBrush(Qt::NoBrush); // Fill pattern of shapes
 
-    this->analog_path.reserve(XAxisProps.getSamplesToShow());
+    _analog_path.reserve(_x_axis_props.getSamplesToShow());
 
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
@@ -63,49 +63,49 @@ void AnalogRenderArea::resizeEvent(QResizeEvent* event) {
 
 void AnalogRenderArea::setPen(const QPen &pen)
 {
-    this->pen = pen;
+    _pen = pen;
     update();
 }
 
 void AnalogRenderArea::setBrush(const QBrush &brush)
 {
-    this->brush = brush;
+    _brush = brush;
     update();
 }
 
 void AnalogRenderArea::setAntialiased(bool antialiased)
 {
-    this->antialiased = antialiased;
+    _antialiased = antialiased;
     update();
 }
 
 void AnalogRenderArea::setHorizontalZoom(int64_t n_samples) {
 
-    XAxisProps.setSamplesToShow(n_samples);
+    _x_axis_props.setSamplesToShow(n_samples);
 
     //Reserve painter path
-    this->analog_path.reserve(n_samples);
+    _analog_path.reserve(n_samples);
 
     update();
 }
 
 void AnalogRenderArea::setCenterSample(int64_t sample) {
 
-    XAxisProps.setCenterSample(sample);
+    _x_axis_props.setCenterSample(sample);
 
     update();
 }
 
 void AnalogRenderArea::setCenterChannel(int64_t channel) {
 
-    YAxisProps.setScrollBarPosition(channel);
+    _y_axis_props.setScrollBarPosition(channel);
 
     update();
 }
 
 void AnalogRenderArea::setGain(float gain) {
 
-    this->global_gain = gain;
+    _global_gain = gain;
 
     update();
 }
@@ -113,31 +113,31 @@ void AnalogRenderArea::setGain(float gain) {
 float AnalogRenderArea::calculate_horizontal_scale() {
     //Calculates the scale in pixels / samples
 
-    float canvas_width = static_cast<float>(this->width()) - this->canvas_label_width; // Reserve 30 pixels for labels
+    float canvas_width = static_cast<float>(this->width()) - _canvas_label_width; // Reserve 30 pixels for labels
 
-    return  canvas_width / static_cast<float>(this->XAxisProps.getSamplesToShow());
+    return  canvas_width / static_cast<float>(_x_axis_props.getSamplesToShow());
 }
 
 void AnalogRenderArea::setVerticalZoom(int64_t n_lines_to_show) {
 
-    YAxisProps.setChannelsToDisplay(n_lines_to_show);
+    _y_axis_props.setChannelsToDisplay(n_lines_to_show);
 
     update();
 }
 
 void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
 
-    int64_t first_sample = this->XAxisProps.getFirstSample();
+    int64_t first_sample = _x_axis_props.getFirstSample();
 
     float sample_under_mouse_event = getMousePositionInSamples(event);
 
-    if (this->debug) {
+    if (_debug) {
         qDebug() << event->pos();
         qDebug() << "This corresponds to sample " << sample_under_mouse_event + first_sample;
         qDebug() << "Nearest channel is " << getNearestChannelToMouse(event);
     }
 
-    this->last_mouse_event_coords = event->pos();
+    _last_mouse_event_coords = event->pos();
 
     update();
 }
@@ -145,10 +145,10 @@ void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
 float AnalogRenderArea::getMousePositionInSamples(QMouseEvent *event) {
     float mouse_x = static_cast<float>(event->pos().x());
 
-    if (mouse_x < this->canvas_label_width) {
+    if (mouse_x < _canvas_label_width) {
         return 0.0;
     } else {
-        return (mouse_x - this->canvas_label_width) / calculate_horizontal_scale();
+        return (mouse_x - _canvas_label_width) / calculate_horizontal_scale();
     }
 }
 
@@ -158,9 +158,9 @@ int AnalogRenderArea::getNearestChannelToMouse(QMouseEvent *event) {
 
     int channel_to_check = 0;
 
-    while(channel_to_check <  YAxisProps.getNChannelsToDisplay()) {
+    while(channel_to_check < _y_axis_props.getNChannelsToDisplay()) {
 
-        float lower_bound = YAxisProps.getLowerChannelBound(channel_to_check) * static_cast<float>(height());
+        float lower_bound = _y_axis_props.getLowerChannelBound(channel_to_check) * static_cast<float>(height());
 
         if (mouse_y_pos < lower_bound) {
             break;
@@ -168,7 +168,7 @@ int AnalogRenderArea::getNearestChannelToMouse(QMouseEvent *event) {
             channel_to_check += 1;
         }
     }
-    return YAxisProps.getDataChannelFromDisplayChannel(channel_to_check);
+    return _y_axis_props.getDataChannelFromDisplayChannel(channel_to_check);
 }
 
 void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
@@ -183,7 +183,7 @@ void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
 
     drawAnalogLines(painter);
 
-    if (this->track_horizontal) {
+    if (_track_horizontal) {
         drawMouseVerticalLine(painter);
     }
 
@@ -208,10 +208,10 @@ void AnalogRenderArea::drawMouseVerticalLine(QPainter& painter) {
 
     painter.setPen(Qt::white);
     painter.drawLine(
-        last_mouse_event_coords.x(),
-        0,
-        last_mouse_event_coords.x(),
-        height()
+            _last_mouse_event_coords.x(),
+            0,
+            _last_mouse_event_coords.x(),
+            height()
         );
 
     painter.restore();
@@ -219,32 +219,34 @@ void AnalogRenderArea::drawMouseVerticalLine(QPainter& painter) {
 
 void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
 
-    painter.setPen(this->pen);
-    painter.setBrush(this->brush);
-    if (antialiased) {
+    painter.setPen(_pen);
+    painter.setBrush(_brush);
+    if (_antialiased) {
         painter.setRenderHint(QPainter::Antialiasing, true);
     }
 
     // Calculate the horizontal scale factor
     qreal scale_x = calculate_horizontal_scale();
-    qreal global_y_gain = this->global_gain;
+    qreal global_y_gain = 1.0;
 
-    for (int x = 0; x < YAxisProps.getNChannelsToDisplay(); x += 1) {
+    for (int x = 0; x < _y_axis_props.getNChannelsToDisplay(); x += 1) {
 
         // Save painter before each line that is drawn
         painter.save();
 
-        int data_channel = YAxisProps.getDataChannelFromDisplayChannel(x);
+        int data_channel = _y_axis_props.getDataChannelFromDisplayChannel(x);
 
-        float y_offset = YAxisProps.getLineOffset(x) * static_cast<float>(height());
-        float this_channel_gain = YAxisProps.getChannelGain(data_channel);
+        float y_offset = _y_axis_props.getLineOffset(x) * static_cast<float>(height());
+        float this_channel_gain = _y_axis_props.getChannelGain(data_channel);
 
+        //Scaling by Y gain here seems to be very slow compared to just multiplying
+        //Path values by gain. NOt sure why
         qreal local_y_gain = global_y_gain + this_channel_gain;
 
-        painter.translate(this->canvas_label_width,y_offset);
+        painter.translate(_canvas_label_width, y_offset);
         painter.scale(scale_x,local_y_gain);
 
-        drawAnalogLine(painter,this->virtual_data[data_channel]);
+        drawAnalogLine(painter,_virtual_data[data_channel]);
 
         painter.restore();
     }
@@ -258,16 +260,16 @@ void AnalogRenderArea::drawChannelLabels(QPainter& painter) {
     QFont font = painter.font() ;
     font.setPixelSize(16);
 
-    for (int x = 0; x < YAxisProps.getNChannelsToDisplay(); x += 1) {
+    for (int x = 0; x < _y_axis_props.getNChannelsToDisplay(); x += 1) {
 
         // Save painter before each line that is drawn
         painter.save();
 
         painter.setFont(font);
 
-        int data_channel = YAxisProps.getDataChannelFromDisplayChannel(x);
+        int data_channel = _y_axis_props.getDataChannelFromDisplayChannel(x);
 
-        float y_offset = YAxisProps.getLineOffset(x) * static_cast<float>(height());
+        float y_offset = _y_axis_props.getLineOffset(x) * static_cast<float>(height());
 
         painter.drawText(
             QPointF(10.0,y_offset),
@@ -280,17 +282,17 @@ void AnalogRenderArea::drawChannelLabels(QPainter& painter) {
 
 void AnalogRenderArea::drawAnalogLine(QPainter& painter, std::vector<float>& data) {
 
-    int first_ind = this->XAxisProps.getFirstSample();
+    int first_ind = _x_axis_props.getFirstSample();
 
-    analog_path.moveTo(0, data[first_ind]);
+    _analog_path.moveTo(0, data[first_ind] * _global_gain);
 
-    for (int x = 0; x < this->XAxisProps.getSamplesToShow(); x += 1 ) {
-        analog_path.lineTo(x, data[first_ind + x]);
+    for (int x = 0; x < _x_axis_props.getSamplesToShow(); x += 1 ) {
+        _analog_path.lineTo(x, data[first_ind + x] * _global_gain);
     }
 
-    painter.drawPath(analog_path);
+    painter.drawPath(_analog_path);
 
-    analog_path.clear();
+    _analog_path.clear();
 }
 
 void AnalogRenderArea::createVirtualData(int n_channels, int n_samples) {
@@ -299,25 +301,25 @@ void AnalogRenderArea::createVirtualData(int n_channels, int n_samples) {
     std::mt19937 random_engine{random_device()};
     std::uniform_real_distribution distribution100 = std::uniform_real_distribution<float>(-10,10);
 
-    virtual_data = std::vector<std::vector<float>>(n_channels);
+    _virtual_data = std::vector<std::vector<float>>(n_channels);
 
     auto gen = [&distribution100, &random_engine](){
         return distribution100(random_engine);
     };
-    for (int i = 0; i< virtual_data.size(); i ++) {
-        virtual_data[i] = std::vector<float>(n_samples);
-        std::generate(begin(virtual_data[i]),end(virtual_data[i]),gen);
+    for (int i = 0; i < _virtual_data.size(); i ++) {
+        _virtual_data[i] = std::vector<float>(n_samples);
+        std::generate(begin(_virtual_data[i]), end(_virtual_data[i]), gen);
     }
 
     // Add spikes
-    for (int i = 0; i< virtual_data.size(); i ++) {
+    for (int i = 0; i < _virtual_data.size(); i ++) {
         auto spikes =  std::vector<float>(n_samples);
         std::generate(begin(spikes),end(spikes),gen);
         for (int j = 0; j < n_samples; j++) {
             if (spikes[j] > 9.5) {
-                virtual_data[i][j] += 10.0;
+                _virtual_data[i][j] += 10.0;
             } else if (spikes[j] < -9.5) {
-                virtual_data[i][j] += -10.0;
+                _virtual_data[i][j] += -10.0;
             }
         }
     }

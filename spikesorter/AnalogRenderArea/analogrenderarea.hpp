@@ -44,28 +44,29 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private:
-    bool debug;
+    bool _debug;
 
-    bool track_horizontal;
+    bool _track_horizontal;
 
-    float canvas_label_width;
+    float _canvas_label_width;
 
-    float global_gain;
+    float _global_gain;
 
-    QPen pen;
-    QBrush brush;
+    bool _antialiased;
 
-    QPainterPath analog_path;
+    QPen _pen;
+    QBrush _brush;
 
-    bool antialiased;
-    QPixmap pixmap;
-    QPoint last_mouse_event_coords;
+    QPainterPath _analog_path;
 
-    std::vector<std::vector<float>> virtual_data;
+    QPixmap _pixmap;
+    QPoint _last_mouse_event_coords;
 
-    int64_t x_axis_width_in_samples;
-    AnalogRenderXAxisProps XAxisProps;
-    AnalogRenderYAxisProps YAxisProps;
+    std::vector<std::vector<float>> _virtual_data;
+
+    int64_t _x_axis_width_in_samples;
+    AnalogRenderXAxisProps _x_axis_props;
+    AnalogRenderYAxisProps _y_axis_props;
 
     float calculate_horizontal_scale();
 
