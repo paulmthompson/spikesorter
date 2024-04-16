@@ -240,7 +240,7 @@ void AnalogRenderArea::_drawAnalogLines(QPainter& painter) {
         float this_channel_gain = _y_axis_props.getChannelGain(data_channel);
 
         //Scaling by Y gain here seems to be very slow compared to just multiplying
-        //Path values by gain. NOt sure why
+        //Path values by gain. Not sure why
         qreal local_y_gain = global_y_gain + this_channel_gain;
 
         painter.translate(_canvas_label_width, y_offset);
@@ -253,6 +253,21 @@ void AnalogRenderArea::_drawAnalogLines(QPainter& painter) {
 
     _drawChannelLabels(painter);
 
+}
+
+void AnalogRenderArea::_drawAnalogLine(QPainter& painter, std::vector<float>& data) {
+
+    int first_ind = _x_axis_props.getFirstSample();
+
+    _analog_path.moveTo(0, data[first_ind] * _global_gain);
+
+    for (int x = 0; x < _x_axis_props.getSamplesToShow(); x += 1 ) {
+        _analog_path.lineTo(x, data[first_ind + x] * _global_gain);
+    }
+
+    painter.drawPath(_analog_path);
+
+    _analog_path.clear();
 }
 
 void AnalogRenderArea::_drawChannelLabels(QPainter& painter) {
@@ -278,21 +293,6 @@ void AnalogRenderArea::_drawChannelLabels(QPainter& painter) {
 
         painter.restore();
     }
-}
-
-void AnalogRenderArea::_drawAnalogLine(QPainter& painter, std::vector<float>& data) {
-
-    int first_ind = _x_axis_props.getFirstSample();
-
-    _analog_path.moveTo(0, data[first_ind] * _global_gain);
-
-    for (int x = 0; x < _x_axis_props.getSamplesToShow(); x += 1 ) {
-        _analog_path.lineTo(x, data[first_ind + x] * _global_gain);
-    }
-
-    painter.drawPath(_analog_path);
-
-    _analog_path.clear();
 }
 
 void AnalogRenderArea::_createVirtualData(int n_channels, int n_samples) {
