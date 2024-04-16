@@ -16,6 +16,13 @@
 #include "AnalogRenderXAxisProps.hpp"
 #include "AnalogRenderYAxisProps.hpp"
 
+/**
+ *
+ * AnalogRanderArea is used for plotting multiple time-dependent signals
+ * Signals can be plotted with vertical offset, or some can be overlaid
+ *
+ * @brief The AnalogRenderArea class
+ */
 class AnalogRenderArea : public QWidget
 {
 Q_OBJECT
@@ -68,16 +75,16 @@ private:
     AnalogRenderXAxisProps _x_axis_props;
     AnalogRenderYAxisProps _y_axis_props;
 
-    float calculate_horizontal_scale();
+    float _calculate_horizontal_scale();
 
-    void drawBackground(QPainter& painter);
-    void drawMouseVerticalLine(QPainter& painter);
-    float getMousePositionInSamples(QMouseEvent *event);
-    int getNearestChannelToMouse(QMouseEvent *event);
-    void drawAnalogLines(QPainter& painter);
-    void drawAnalogLine(QPainter& painter, std::vector<float>& data);
-    void createVirtualData(int n_channels, int n_samples);
-    void drawChannelLabels(QPainter& painter);
+    void _drawBackground(QPainter& painter);
+    void _drawMouseVerticalLine(QPainter& painter);
+    float _getMousePositionInSamples(QMouseEvent *event);
+    int _getNearestChannelToMouse(QMouseEvent *event);
+    void _drawAnalogLines(QPainter& painter);
+    void _drawAnalogLine(QPainter& painter, std::vector<float>& data);
+    void _createVirtualData(int n_channels, int n_samples);
+    void _drawChannelLabels(QPainter& painter);
 };
 
 

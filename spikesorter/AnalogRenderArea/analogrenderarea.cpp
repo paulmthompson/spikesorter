@@ -11,11 +11,11 @@
 
 #include <random>
 
-AnalogRenderArea::AnalogRenderArea(QWidget *parent)
-        : QWidget(parent)
+AnalogRenderArea::AnalogRenderArea(QWidget *parent) :
+    QWidget(parent),
+    _debug{false},
+    _track_horizontal{true}
 {
-    _debug = false;
-    _track_horizontal = true;
     _canvas_label_width = 30.0;
     _global_gain = 1.0;
 
@@ -23,7 +23,7 @@ AnalogRenderArea::AnalogRenderArea(QWidget *parent)
     int sample_rate = 30000;
     int channels_to_display = 1;
 
-    createVirtualData(virtual_data_n_channel,sample_rate * 5);
+    _createVirtualData(virtual_data_n_channel,sample_rate * 5);
 
     _x_axis_props = AnalogRenderXAxisProps();
     _x_axis_props.setXAxisProps(sample_rate, sample_rate * 5);
@@ -110,7 +110,7 @@ void AnalogRenderArea::setGain(float gain) {
     update();
 }
 
-float AnalogRenderArea::calculate_horizontal_scale() {
+float AnalogRenderArea::_calculate_horizontal_scale() {
     //Calculates the scale in pixels / samples
 
     float canvas_width = static_cast<float>(this->width()) - _canvas_label_width; // Reserve 30 pixels for labels
@@ -129,12 +129,12 @@ void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
 
     int64_t first_sample = _x_axis_props.getFirstSample();
 
-    float sample_under_mouse_event = getMousePositionInSamples(event);
+    float sample_under_mouse_event = _getMousePositionInSamples(event);
 
     if (_debug) {
         qDebug() << event->pos();
         qDebug() << "This corresponds to sample " << sample_under_mouse_event + first_sample;
-        qDebug() << "Nearest channel is " << getNearestChannelToMouse(event);
+        qDebug() << "Nearest channel is " << _getNearestChannelToMouse(event);
     }
 
     _last_mouse_event_coords = event->pos();
@@ -142,17 +142,17 @@ void AnalogRenderArea::mouseMoveEvent(QMouseEvent *event){
     update();
 }
 
-float AnalogRenderArea::getMousePositionInSamples(QMouseEvent *event) {
+float AnalogRenderArea::_getMousePositionInSamples(QMouseEvent *event) {
     float mouse_x = static_cast<float>(event->pos().x());
 
     if (mouse_x < _canvas_label_width) {
         return 0.0;
     } else {
-        return (mouse_x - _canvas_label_width) / calculate_horizontal_scale();
+        return (mouse_x - _canvas_label_width) / _calculate_horizontal_scale();
     }
 }
 
-int AnalogRenderArea::getNearestChannelToMouse(QMouseEvent *event) {
+int AnalogRenderArea::_getNearestChannelToMouse(QMouseEvent *event) {
 
     float mouse_y_pos = static_cast<float>(event->pos().y());
 
@@ -179,12 +179,12 @@ void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
 
     QPainter painter(this);
 
-    drawBackground(painter);
+    _drawBackground(painter);
 
-    drawAnalogLines(painter);
+    _drawAnalogLines(painter);
 
     if (_track_horizontal) {
-        drawMouseVerticalLine(painter);
+        _drawMouseVerticalLine(painter);
     }
 
     qint64 elapsed_ns = paintTimer.nsecsElapsed();
@@ -193,7 +193,7 @@ void AnalogRenderArea::paintEvent(QPaintEvent * /* event */)
     qDebug() << "Time to paint : " << elapsed_us << "us";
 }
 
-void AnalogRenderArea::drawBackground(QPainter& painter)
+void AnalogRenderArea::_drawBackground(QPainter& painter)
 {
     // Black background
     painter.setRenderHint(QPainter::Antialiasing, false);
@@ -202,7 +202,7 @@ void AnalogRenderArea::drawBackground(QPainter& painter)
     painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
 }
 
-void AnalogRenderArea::drawMouseVerticalLine(QPainter& painter) {
+void AnalogRenderArea::_drawMouseVerticalLine(QPainter& painter) {
 
     painter.save();
 
@@ -217,7 +217,7 @@ void AnalogRenderArea::drawMouseVerticalLine(QPainter& painter) {
     painter.restore();
 }
 
-void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
+void AnalogRenderArea::_drawAnalogLines(QPainter& painter) {
 
     painter.setPen(_pen);
     painter.setBrush(_brush);
@@ -226,7 +226,7 @@ void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
     }
 
     // Calculate the horizontal scale factor
-    qreal scale_x = calculate_horizontal_scale();
+    qreal scale_x = _calculate_horizontal_scale();
     qreal global_y_gain = 1.0;
 
     for (int x = 0; x < _y_axis_props.getNChannelsToDisplay(); x += 1) {
@@ -246,16 +246,16 @@ void AnalogRenderArea::drawAnalogLines(QPainter& painter) {
         painter.translate(_canvas_label_width, y_offset);
         painter.scale(scale_x,local_y_gain);
 
-        drawAnalogLine(painter,_virtual_data[data_channel]);
+        _drawAnalogLine(painter,_virtual_data[data_channel]);
 
         painter.restore();
     }
 
-    drawChannelLabels(painter);
+    _drawChannelLabels(painter);
 
 }
 
-void AnalogRenderArea::drawChannelLabels(QPainter& painter) {
+void AnalogRenderArea::_drawChannelLabels(QPainter& painter) {
 
     QFont font = painter.font() ;
     font.setPixelSize(16);
@@ -280,7 +280,7 @@ void AnalogRenderArea::drawChannelLabels(QPainter& painter) {
     }
 }
 
-void AnalogRenderArea::drawAnalogLine(QPainter& painter, std::vector<float>& data) {
+void AnalogRenderArea::_drawAnalogLine(QPainter& painter, std::vector<float>& data) {
 
     int first_ind = _x_axis_props.getFirstSample();
 
@@ -295,7 +295,7 @@ void AnalogRenderArea::drawAnalogLine(QPainter& painter, std::vector<float>& dat
     _analog_path.clear();
 }
 
-void AnalogRenderArea::createVirtualData(int n_channels, int n_samples) {
+void AnalogRenderArea::_createVirtualData(int n_channels, int n_samples) {
 
     std::random_device random_device;
     std::mt19937 random_engine{random_device()};
