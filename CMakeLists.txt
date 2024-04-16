@@ -45,16 +45,18 @@ set(PROJECT_SOURCES
 
         spikesorter/AnalogRenderArea/analogrenderarea.hpp
         spikesorter/AnalogRenderArea/analogrenderarea.cpp
+
         spikesorter/AnalogRenderArea/AnalogRenderXAxisProps.hpp
         spikesorter/AnalogRenderArea/AnalogRenderXAxisProps.cpp
+
         spikesorter/AnalogRenderArea/AnalogRenderYAxisProps.hpp
+        spikesorter/AnalogRenderArea/AnalogRenderYAxisProps.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(spikesorter
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        spikesorter/AnalogRenderArea/AnalogRenderXAxisProps.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET spikesorter APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

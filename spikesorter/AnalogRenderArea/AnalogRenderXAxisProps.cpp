@@ -9,7 +9,7 @@ AnalogRenderXAxisProps::AnalogRenderXAxisProps()
     _center_sample = 0;
 
     _n_samples_to_show = 10000;
-    calculate_first_and_last_sample_to_show();
+    _calculate_first_and_last_sample_to_show();
 }
 
 void AnalogRenderXAxisProps::setXAxisProps(float sampling_rate, int n_samples_total)
@@ -17,22 +17,22 @@ void AnalogRenderXAxisProps::setXAxisProps(float sampling_rate, int n_samples_to
     _n_samples_total = n_samples_total;
     _sampling_rate = sampling_rate;
 
-    calculate_first_and_last_sample_to_show();
+    _calculate_first_and_last_sample_to_show();
 };
 
 void AnalogRenderXAxisProps::setSamplesToShow(int64_t n_samples)
 {
     _n_samples_to_show = n_samples;
-    calculate_first_and_last_sample_to_show();
+    _calculate_first_and_last_sample_to_show();
 };
 
 void AnalogRenderXAxisProps::setCenterSample(int64_t sample)
 {
     _center_sample = sample;
-    calculate_first_and_last_sample_to_show();
+    _calculate_first_and_last_sample_to_show();
 };
 
-void AnalogRenderXAxisProps::calculate_first_and_last_sample_to_show()
+void AnalogRenderXAxisProps::_calculate_first_and_last_sample_to_show()
 {
 
     if (_n_samples_total == 0) {

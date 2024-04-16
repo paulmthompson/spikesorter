@@ -32,7 +32,7 @@ private:
     int64_t _first_sample_to_show;
     int64_t _last_sample_to_show;
 
-    void calculate_first_and_last_sample_to_show();
+    void _calculate_first_and_last_sample_to_show();
 };
 
 #endif // ANALOGRENDERXAXISPROPS_HPP
