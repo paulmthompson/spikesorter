@@ -66,11 +66,11 @@ private:
     std::vector<float> _line_offsets;
     std::vector<float> _lower_channel_bounds;
 
-    void calculate_line_offsets();
+    void _calculate_line_offsets();
 
-    void calculate_channel_bounds();
+    void _calculate_channel_bounds();
 
-    void calculate_which_channels_to_show();
+    void _calculate_which_channels_to_show();
 
 };
 

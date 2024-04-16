@@ -14,18 +14,18 @@ void AnalogRenderYAxisProps::setYAxisProps(int64_t n_channels_total, int64_t n_c
 
     _per_channel_gain = std::vector<float>(n_channels_total, 0.0);
 
-    calculate_line_offsets();
-    calculate_channel_bounds();
-    calculate_which_channels_to_show();
+    _calculate_line_offsets();
+    _calculate_channel_bounds();
+    _calculate_which_channels_to_show();
 
 };
 
 void AnalogRenderYAxisProps::setChannelsToDisplay(int64_t n_channels_to_display)
 {
     _n_channels_to_show = n_channels_to_display;
-    calculate_line_offsets();
-    calculate_channel_bounds();
-    calculate_which_channels_to_show();
+    _calculate_line_offsets();
+    _calculate_channel_bounds();
+    _calculate_which_channels_to_show();
 };
 
 void AnalogRenderYAxisProps::setScrollBarPosition(int64_t position)
@@ -39,10 +39,10 @@ void AnalogRenderYAxisProps::setScrollBarPosition(int64_t position)
     }
 
     _scroll_bar_position = position;
-    calculate_which_channels_to_show();
+    _calculate_which_channels_to_show();
 };
 
-void AnalogRenderYAxisProps::calculate_line_offsets()
+void AnalogRenderYAxisProps::_calculate_line_offsets()
 {
 
     _line_offsets = std::vector<float>(_n_channels_to_show);
@@ -53,7 +53,7 @@ void AnalogRenderYAxisProps::calculate_line_offsets()
     }
 };
 
-void AnalogRenderYAxisProps::calculate_channel_bounds()
+void AnalogRenderYAxisProps::_calculate_channel_bounds()
 {
 
     _lower_channel_bounds = std::vector<float>(_n_channels_to_show);
@@ -64,7 +64,7 @@ void AnalogRenderYAxisProps::calculate_channel_bounds()
     }
 };
 
-void AnalogRenderYAxisProps::calculate_which_channels_to_show()
+void AnalogRenderYAxisProps::_calculate_which_channels_to_show()
 {
 
     _which_channels_to_show = std::vector<int64_t>(_n_channels_to_show, 0);
