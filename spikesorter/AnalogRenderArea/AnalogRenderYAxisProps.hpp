@@ -2,8 +2,6 @@
 #define ANALOGRENDERYAXISPROPS_HPP
 
 #include <cstdint>
-#include <iostream>
-#include <ostream>
 #include <vector>
 
 /**

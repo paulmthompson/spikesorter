@@ -1,6 +1,9 @@
 
 #include "AnalogRenderYAxisProps.hpp"
 
+#include <iostream>
+#include <ostream>
+
 AnalogRenderYAxisProps::AnalogRenderYAxisProps()
 {
     _n_channels_total = 0;
